@@ -135,6 +135,9 @@ image {
     width: 80%;
     height: 100%;  
 }
+#div-to-toggle { 
+    background-color: rgb(255, 122, 89); 
+}
 /* @media screen and (max-width: 600px) {
     .ziba{
         background-image: none;

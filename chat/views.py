@@ -11,6 +11,7 @@ from . import models
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+
 @api_view(["POST"])
 def checkseen(request, pk):
     check= models.Roomcode.objects.filter(code= pk)
@@ -34,8 +35,11 @@ def Index(request):
         Search= request.GET["search"]
         users= models.profile.objects.filter(Q(userid__icontains= Search) | Q(owner_prof__username__icontains= Search))
     except:
-        users= models.profile.objects.all()
-    return render(request, 'chat/index.html', {"users":users})
+        print(request.user.username)
+        users= models.profile.objects.exclude(owner_prof = request.user)
+        number_of_users = int(users.count()) + 1
+
+    return render(request, 'chat/index.html', {"users":users, "count":number_of_users})
 
 ############################# users profile ##############################
 @login_required(login_url='atent:login')
@@ -51,6 +55,7 @@ def profile(request, pk):
     except:
         messages.error(request, 'No such profile')
         return HttpResponseRedirect(reverse("atent:Notfound"))
+        
     if prof.owner_prof.id == request.user.id:
         try:
             roomcode= models.Roomcode.objects.filter(sender=request.user, receiver=request.user)

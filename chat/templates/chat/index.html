@@ -10,10 +10,17 @@
             </div>
         </div>
     </form>
+    Number of registered users: {{count}}
     <hr>
-    {% for user in users %}
-    <div class="list-group-item" id="rooms">
-        <a href="{% url 'chat:profile' user.owner_prof.id%}">@{{user.userid}}</a>{{user.username}}  
-    </div><br>
-    {% endfor %}
+    {% if users %}
+        {% for user in users %}
+        <div class="list-group-item" id="rooms">
+            <a href="{% url 'chat:profile' user.owner_prof.id%}">@{{user.userid}}</a>{{user.username}}  
+        </div><br>
+        {% endfor %}
+    {% else %}
+        <center>
+            <div class="list-group-item" id="rooms">No users yet</div><br>
+        </center>
+    {% endif %}
 {% endblock %}
