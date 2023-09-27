@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div><br>
+        {% if user.id == prof.owner_prof.id %}
+            <div class="card" id="roomss" style="text-align: left;">
+                Username: {{prof.owner_prof}}<br><br>
+                Email: {{user.email}}<br><br>
+                UserID: @{{prof.userid}}<br><br>
+                Phone number: {{prof.phone_number}}<br><br>
+                Profile Image:<br>
+                {% if prof.picture %}
+                    <a href="{{prof.picture.url}}/">
+                        <img style="max-height: 350px; max-width: 98%;" src="{{prof.picture.url}}"/>
+                    </a>
+                {% else %}
+                    <p>No profile image</p>
+                {% endif %}<br><br>
+                Something about Yourself: {{prof.about}}<br><br>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn btn-primary" type="button">
+                    <a href="{% url 'chat:editprof' prof.id %}" style="color: aliceblue;">Edit Porfile</a>
+                </button><br>
+            </div>
+        {% else %}
+            <button type="button" class="btn btn-success">
+                <a style="color:aliceblue;" href="{% url 'chat:privatems' roomcode %}">Send message</a>
+            </button>
+            <hr>
+            <div>
+                Username: {{prof.owner_prof}}<br>
+                {{prof.about}}<br>
+                {% if prof.picture %}
+                <a href="{{prof.picture.url}}/">
+                    <img style="max-height: 350px; max-width: 98%;" src="{{prof.picture.url}}"/>
+                </a>
+                {% else %}
+                <p>No profile image</p>
+                {% endif %}<br>
+            </div>
+        {% endif %}
+    </div>
+    <br>
+
+    </div>
+{% endblock %}

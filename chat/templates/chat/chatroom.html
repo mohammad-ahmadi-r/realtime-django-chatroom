@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% block content %}
+  <div class="endchatroom">
+    <button style="text-align: left;" class="btn btn-dark"><a style="color: aliceblue;" href="#endchat">Last PM</a><i class="fa fa-caret-down"></i></button>
+  </div>
+  <div style="text-align: center;"><br>
+      <h2>Chatroom: <a href="{% url 'chat:profile' receiver.id %}">{{receiver.username}}</a></h2>
+      {% if online == True %}
+        <p style="color: green;">Online</p>
+      {% else %}
+        <p style="color: black;">Offline</p>
+      {% endif %}
+      <hr>
+        <div class="column is-6 is-offset-3">
+            <div class="box">
+                <div id="chat-messages" style="max-height: 300px; overflow-y: scroll;"></div>
+            </div>
+        </div>
+        <div>
+            {% for m in allchats %}
+                {% if m.sender == user %}
+                    <p id="{{m.id}}" style="text-align:right; color: #950740;" onclick="Hide('{{m.id}}')">{{ m.content }}</p>
+                {% else %}
+                    <p id="{{m.id}}" style="text-align:left; color: #f6f865;">{{ m.content }}</p>
+                {% endif %} 
+            {% endfor %}
+        </div>
+        <div id="questions"></div>
+        <div style="overflow:10px">
+            <p style="text-align: left;">
+                <div id="checkonchat" class="list-group" style="color: #030303;"></div>
+            </p>
+            <textarea id="chat-message-input" rows="3" class="form-control" cols="25" placeholder="enter text"></textarea>
+            <input id="chat-message-submit" type="button" class="btn btn-primary" value="Send">
+            <button type="button" class="btn btn-danger">
+                <a style="color:aliceblue;" href="{% url 'chat:index' %}">Home</a>
+            </button>
+            <p id="endchat" type="hidden"></p>
+        </div>
+    </div>
+
+    
+    {{ roomcode|json_script:"room-name" }}
+    {{ user.username|json_script:"user-name" }}
+    {{ user.id|json_script:"user-id" }}
+    {{ receiver.id|json_script:"receiver-name" }}
+    
+    <script>
+        const roomName = JSON.parse(document.getElementById('room-name').textContent);
+        const userName = JSON.parse(document.getElementById('user-name').textContent);
+        const userId = JSON.parse(document.getElementById('user-id').textContent);
+        const receiverName = JSON.parse(document.getElementById('receiver-name').textContent);
+
+        const chatSocket = new WebSocket(
+            'ws://'
+            + window.location.host
+            + '/ws/chat/'
+            + roomName
+            + '/'
+        );
+
+        // onmessage - An event listener to be called when a message is received from the server.
+        chatSocket.onmessage = function(e) {
+            // JSON.parse() converts the JSON object back into the original object,
+            // then examine and act upon its contents.
+            const data = JSON.parse(e.data);
+            var questionCount = 0;
+            if (data.msgid) {
+                msg= document.getElementById(data.msgid);
+                msg.style.display= 'none';
+                msg= document.getElementById(data.msgid);
+                msg.style.display= 'none';
+            } else {
+                if (data.username == userName) {
+                    var DIV = document.createElement("div");
+                    var BR = document.createElement("BR");
+                    DIV.setAttribute("id", data.messageid);
+                    DIV.innerHTML = `
+                        <p type="text" style="text-align:right; color: #950740;" name="${questionCount}" onclick="Hide('${data.messageid}')">
+                            ${data.message}
+                        </p>`;
+                    BR.setAttribute("id", `br-${data.messageid}`)
+                    document.getElementById("questions").appendChild(DIV);
+                    questionCount == questionCount++;
+
+                } else {
+                    var DIV = document.createElement("div");
+                    var BR = document.createElement("BR");
+                    DIV.setAttribute("id", data.messageid);
+                    DIV.innerHTML = `
+                        <p type="text" style="text-align:left; color: #f6f865;" name="${questionCount}">
+                            ${data.message}
+                        </p>`;
+                        BR.setAttribute("id", `br-${data.messageid}`)
+                    document.getElementById("questions").appendChild(DIV);
+                    questionCount++;
+                }
+            }
+        };
+
+        // onclose - An event listener to be called when the connection is closed.
+        chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+
+        // Delete message//
+        function Hide(id){
+            var ms= document.getElementById(id);
+            chatSocket.send(JSON.stringify({
+                'msg': ms.id,
+            }));
+        }
+
+        document.querySelector('#chat-message-input').focus();
+        document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // enter, return
+                document.querySelector('#chat-message-submit').click();
+            }
+        };
+
+        document.querySelector('#chat-message-submit').onclick = function(e) {
+            const messageInputDom = document.querySelector('#chat-message-input');
+            const message = messageInputDom.value;
+
+            // Send the msg object as a JSON-formatted string.
+            chatSocket.send(JSON.stringify({
+                'message': message,
+                'username':userName,
+                'receivername':receiverName
+            }));
+
+            // Blank the text input element, ready to receive the next line of text from the user.
+            messageInputDom.value = '';
+        };
+    </script>
+    <script>
+        setInterval(function(){ 
+            function getCookie(name) {
+                var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = cookies[i].trim();
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                    }
+                }
+                    }
+                    return cookieValue;
+            }
+            var csrftoken = getCookie('csrftoken');
+        
+        $( function () {
+            var url = 'http://localhost:8000/checkseen/'+ roomName +'/'
+
+            fetch(url, {
+                method:'POST',
+                headers:{
+                'Content-type':'application/json',
+                'X-CSRFToken':csrftoken,
+                },
+                body:JSON.stringify({'receiver':receiverName})
+            })
+
+            .then((resp) => resp.json())
+            .then(function(data){
+                
+                if ( data == "sender is on chat") {
+                    var check= document.getElementById("checkonchat");
+                    var checknot= document.getElementById("checknotonchat");
+                    check.innerText = data;
+                    check.style.backgroundColor = 'green';
+                    console.log("is on chat");
+                
+                } else if ( data == "receiver not in chat") {
+                    var check= document.getElementById("checkonchat");
+                    var checknot= document.getElementById("checknotonchat");
+                    check.innerText = data;
+                    check.style.backgroundColor = 'white';
+                    console.log("not in chat");
+                } else if ( data == "receiver is on chat") {
+                    var check= document.getElementById("checkonchat");
+                    var checknot= document.getElementById("checknotonchat");
+                    check.innerText = data;
+                    check.style.backgroundColor = 'green';
+                    console.log("is on chat");
+                }
+            })
+        })
+    }, 5000);
+    </script>
+{% endblock %}

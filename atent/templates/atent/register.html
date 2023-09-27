@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="form-group" style="text-align: center;"><br>
+      <form action="{% url 'atent:register' %}" method="POST">
+        {% csrf_token %}
+        <h2>Register</h2><hr>
+        <div class="form-group" style="text-align: center;">
+          <div>
+            <label for="Username"><i style="color: red;">*</i> Username</label><br>
+            <input id="username" type="text" name="username" class="form-control" placeholder="At least 3 charachter" required pattern=".{3,}">
+            <div id="uservalidator" style="color: green; text-align:center">Cheking username...</div>
+          </div>
+          <br>
+          <div>
+            <label for="email"><i style="color: red;">*</i> Email</label><br>
+            <input id= 'email' type="text" name="email" class="form-control" placeholder="example@gmail.com" required pattern=".{3,}">
+            <div id="emailvalidator" style="color: green; text-align:center">Cheking email...</div>
+          </div>
+          <br>
+          <div>
+            <label for="password"><i style="color: red;">*</i> Password</label><br>
+            <input id="pass" type="password" name="password" class="form-control" placeholder="Use numbers and words">
+            <div style="text-align: left;">
+              <input type="checkbox" onclick="myFunction()">Show Password
+            <div id="strenghofpass" style="color: green; text-align:center">Cheking password...</div>
+              <p>Minimum 8 characters.</p>
+              <p>The alphabets must be between [a-z]</p>
+              <p>At least one alphabet should be of Upper Case [A-Z]</p>
+              <p>At least 1 number or digit between [0-9].</p>
+              <p>At least 1 character from [ _ or @ or $ ].</p>
+            </div>
+          </div>
+          <br>
+          
+          <div class="pt-1 mb-4">
+            <button id="mybtn" class="btn btn-primary btn-lg btn-block" formnovalidate type="submit">Register</button>
+          </div>
+        </div>
+      </form>
+      <br>
+      <a href="{% url 'atent:login' %}" style="color:black">Already registered?</a>
+    </div>
+    <br>
+    <script type="text/javascript">
+      
+      function myFunction() {
+        var x = document.getElementById("pass");
+        if (x.type === "password") {
+          x.type = "text";
+        } else {
+          x.type = "password";
+        }
+      }
+            
+      function getCookie(name) {
+        var cookieValue = null;
+		    if (document.cookie && document.cookie !== '') {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+              break;
+            }
+          }
+		    }
+		    return cookieValue;
+      }
+      var csrftoken = getCookie('csrftoken');
+      
+      var username = document.getElementById("username").value
+      var email = document.getElementById("email").value
+      var pass = document.getElementById("pass").value
+      var reg_btn = document.getElementById("mybtn")
+
+      reg_btn.addEventListener("click", function() {
+        if ( username.value || email.value || pass.value == '') {
+          reg_btn.disabled= true;
+          alert("Fill the form!")
+        } else {
+          reg_btn.disabled= false;
+        }
+      })
+      
+      $( function Checkpass() {
+        
+        $("#pass").on( "change", function() {
+          var url = 'http://localhost:8000/account/checkpass/'
+          
+          var pass = document.getElementById('pass').value
+          fetch(url, {
+            method:'POST',
+            headers:{
+              'Content-type':'application/json',
+              'X-CSRFToken':csrftoken,
+            },
+            body:JSON.stringify({'pass':pass})
+          })
+
+          .then((resp) => resp.json())
+          .then(function(data){
+            
+            let btn = document.getElementById('mybtn')
+            var result = document.getElementById('strenghofpass');
+            
+            if ( data == "strong pass") {
+              result.value= null;
+              result.style.setProperty("color", "green");
+              result.innerText= data;
+              btn.disabled=false;
+              
+            } else if ( data == "invalid pass") {
+              result.style.setProperty("color", "red");
+              result.innerText = data;
+              btn.disabled=true;
+            }
+          })
+        })
+      })
+
+      $( function username() {
+        
+        $("#username").on( "change", function() {
+          var url = 'http://localhost:8000/account/checkusername/'
+          
+          var username = document.getElementById('username').value
+          fetch(url, {
+            method:'POST',
+            headers:{
+              'Content-type':'application/json',
+              'X-CSRFToken':csrftoken,
+            },
+            body:JSON.stringify({'username':username})
+          })
+
+          .then((resp) => resp.json())
+          .then(function(data){
+            
+            let btn = document.getElementById('mybtn')
+            var result = document.getElementById('uservalidator');
+            
+            if ( data == "Valid username") {
+              result.value= null;
+              result.style.setProperty("color", "green");
+              result.innerText= data;
+              btn.disabled=false;
+              
+            } else if ( data == "Already exist") {
+              result.style.setProperty("color", "red");
+              result.innerText = data;
+              btn.disabled=true;
+            }
+          })
+        })
+      })
+      $( function emailcheck() {
+        
+        $("#email").on( "change", function() {
+          var url = 'http://localhost:8000/account/emailcheck/'
+          
+          var email = document.getElementById('email').value
+          fetch(url, {
+            method:'POST',
+            headers:{
+              'Content-type':'application/json',
+              'X-CSRFToken':csrftoken,
+            },
+            body:JSON.stringify({'email':email})
+          })
+
+          .then((resp) => resp.json())
+          .then(function(data){
+            
+            let btn = document.getElementById('mybtn')
+            var result = document.getElementById('emailvalidator');
+            
+            if ( data == "Valid email") {
+              result.value= null;
+              result.style.setProperty("color", "green");
+              result.innerText= data;
+              btn.disabled=false;
+              
+            } else if ( data == "Already exist") {
+              result.style.setProperty("color", "red");
+              result.innerText = data;
+              btn.disabled=true;
+
+            } else if ( data == "Invalid email" ) {
+              result.style.setProperty("color", "red");
+              result.innerText = data;
+              btn.disabled=true;
+            }
+          })
+        })
+      })
+    </script>
+
+{% endblock %}

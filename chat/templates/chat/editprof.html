@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="form-group" style="text-align: left;"><br>
+            <form action="" method="POST" enctype="multipart/form-data">
+                <h2 style="text-align: center;">fill wich you want</h2><br>
+                {% csrf_token %}
+                {% if user.id == prof.owner_prof.id %}
+                    <label for="username">Username: </label><br>
+                    <input type="text" name="username" class="form-control" placeholder="{{prof.owner_prof}}"><br><hr>
+                    <label for="userid">Userid: </label><br>
+                    <input type="text" name="userid" class="form-control" placeholder="@{{prof.userid}}"><br><hr>
+                    <label for="email">Email: 
+                        {% if user.profile.level == 1 %}
+                            <p style="color: green;">Verified</p>
+                        {% elif user.profile.level == 0 %}
+                            <p style="color: red;">Not verified</p>
+                        {% endif %}
+                    </label><br>
+                    <input type="email" name="email" class="form-control" placeholder="{{user.email}}"><br><hr>
+                    <label for="live">City: </label><br>
+                    <input type="text" name="live" class="form-control" placeholder="{{prof.live}}/{{prof.city}}" disabled><br><hr>
+                    <label for="phone">Phone: </label><br>
+                    <input type="text" name="phone" class="form-control" placeholder="{{prof.phone_number}}"><br><hr>
+                    <label for="about">About: </label><br>
+                    <input type="text" name="about" class="form-control" placeholder="{{prof.about}}"><br><hr>
+                    <label for="upload">Image: </label><br>
+                    <input type="file" name="upload" class="form-control" accept="image/*">
+                    <hr>
+                {% else %}
+                    {{prof.owner_prof}}<br>
+                    {{prof.live}}<br>
+                    {{prof.about}}<br>
+                {% endif %}
+                <br>
+                <button type="submit" style="text-align: center;" class="btn btn-primary">Edit</button>
+            </form>
+    </div>
+    <br>
+{% endblock %}

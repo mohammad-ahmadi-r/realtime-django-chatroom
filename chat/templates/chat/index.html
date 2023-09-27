@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form method="GET">
+        <div class="row">
+            <div class="col">
+                <input name="search" type="text" class="form-control" placeholder="Search for your friends">
+            </div>
+            <div class="col">
+                <input class="btn btn-warning" type="submit">
+            </div>
+        </div>
+    </form>
+    <hr>
+    {% for user in users %}
+    <div class="list-group-item" id="rooms">
+        <a href="{% url 'chat:profile' user.owner_prof.id%}">@{{user.userid}}</a>{{user.username}}  
+    </div><br>
+    {% endfor %}
+{% endblock %}

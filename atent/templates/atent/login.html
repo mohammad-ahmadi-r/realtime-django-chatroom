@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-group" style="text-align: center;"><br>
+    <form action="{% url 'atent:login' %}" method="POST">
+      {% csrf_token %}
+      <h2>Login</h2><hr>
+      <div style="text-align: center;">
+        <div>
+          <label for="username"><i style="color: red;">*</i> Username</label><br>
+          <input type="text" name="username" class="form-control" placeholder="At least 3 charachter" required pattern=".{3,}">
+        </div>
+        <br>
+        <div>
+          <label for="password"><i style="color: red;">*</i> Password</label><br>
+          <input id="pass" type="password" name="password" class="form-control" placeholder="Use numbers and words" required pattern=".{3,}">
+        </div>
+        <div style="text-align: left;">
+          <input type="checkbox" onclick="myFunction()">Show Password
+        </div>
+        <br>
+        {% if request.GET.next %}
+          <input type="hidden" name="next" value="{{request.GET.next}}">
+        {% endif %}
+        <div class="pt-1 mb-4">
+          <button class="btn btn-primary btn-lg btn-block" type="submit">Login</button>
+        </div>
+      </div>
+    </form>
+    <br>
+    <a href="{% url 'atent:register' %}" style="color:black">Not register?</a><br>
+    <a href="{% url 'atent:changepass' %}" style="color:black">Forgot your password?</a>
+  </div>
+  <br>
+</div>
+<script>
+  function myFunction() {
+        var x = document.getElementById("pass");
+        if (x.type === "password") {
+          x.type = "text";
+        } else {
+          x.type = "password";
+        }
+      }
+</script>
+{% endblock %}

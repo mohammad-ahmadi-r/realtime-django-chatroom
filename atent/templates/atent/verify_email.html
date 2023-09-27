@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+  {% block content %}
+  <div class="form-group" style="text-align: center;"><br>
+      <form method="POST">
+        {% csrf_token %}
+        <h2>Verify Email</h2><hr>
+        <h4>Is this your email?<br><h2 style="color: blue;">{{email}}</h2></h4>
+        <button class="btn btn-primary" type="submit">YES</button>
+        <button class="btn btn-warning"><a href="{% url 'chat:index' %}" style="color:black">NO</a></button>
+      </form>
+  </div>
+{% endblock %}

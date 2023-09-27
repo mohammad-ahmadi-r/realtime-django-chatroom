@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-group" style="text-align: center;"><br>
+    <form action="{% url 'atent:changepass' %}" method="POST">
+      {% csrf_token %}
+      <h2>Change password</h2><hr>
+      <div style="text-align: center;">
+        <div>
+          <label for="email"><i style="color: red;">*</i> Email</label><br>
+          <input type="email" name="email" class="form-control" placeholder="example@gmail.com" required pattern=".{3,}">
+        </div>
+        <br>
+        <button class="btn btn-primary btn-lg btn-block" type="submit">Submit</button>
+      </div>
+    </form>
+    <br>
+  </div>
+  <br>
+</div>
+{% endblock %}

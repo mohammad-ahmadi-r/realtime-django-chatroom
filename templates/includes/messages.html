@@ -1,0 +1,9 @@
+{% for message in messages %}
+  <div id="div-to-toggle" class="container-fluid p-0">
+    <div class="alert {{ message.tags }} alert-dismissible" role="alert" >
+      <button type="button" id="close-btn" class="btn btn-close" data-dismiss="alert" aria-label="Close">
+      </button>
+      {{ message }}
+    </div>
+  </div>
+{% endfor %}
