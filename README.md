@@ -1,9 +1,9 @@
-# realtime-django-chatroom
+# django-realtime-chatroom
 a fullstack django web application that is realtime for users using channels and websocket
 
 ## Description
 
-Project Name is a full-stack chat application built with Django, featuring real-time communication using websockets. 
+This is a full-stack chat application built with Django, featuring real-time communication using websockets. 
 It provides a seamless chat experience for users, allowing them to connect and interact in real-time.
 
 ## Features
